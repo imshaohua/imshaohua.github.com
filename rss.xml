@@ -1,9 +1,22 @@
 <?xml version="1.0"?>
 <rss version="2.0">
   <channel>
-    <title>imshaohua</title>
+    <title>I&#39;m Shaohua</title>
     <link>http://imshaohua.github.com</link>
-    <pubDate>2013-08-03 06:43:08 +0800</pubDate>
+    <pubDate>2013-08-23 03:43:23 +0800</pubDate>
+    <item>
+      <title>在项目的日子里</title>
+      <link>http://imshaohua.github.com/Blog/%E5%9C%A8%E9%A1%B9%E7%9B%AE%E7%9A%84%E6%97%A5%E5%AD%90%E9%87%8C/</link>
+      <pubDate>2013-08-23 12:00:00 +0800</pubDate>
+      <description>&lt;h1&gt;卖到项目组干活&lt;/h1&gt;
+
+&lt;p&gt;大概在 20130808-20130912 被转手卖到另外一个热门项目里，是公司的明星项目。&lt;/p&gt;
+
+&lt;p&gt;感觉就是每天都加班到很晚，开会一大帮人，系分测分评审一大帮人。至于为什么这么多人希望这样，不知道，也许是想向老大表现，更好的晋升，拿到高KPI吧~&lt;/p&gt;
+
+&lt;p&gt;至于我，仅仅希望早点回家&lt;/p&gt;
+</description>
+    </item>
     <item>
       <title>你的第一篇博客</title>
       <link>http://imshaohua.github.com/2012/new-born.html</link>
