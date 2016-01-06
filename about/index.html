@@ -84,7 +84,7 @@
 
 <div class="row">
   <div class="span12">
-    <h2>自我介绍</h2>
+    <h2><a style="display: block;" name="自我介绍" href="#自我介绍"></a>自我介绍</h2>
 
 <p>各种联系方式：</p>
 
@@ -95,13 +95,9 @@
 <li>微博：imshaohua</li>
 </ul>
 
-<h2>工作单位</h2>
+<h2><a style="display: block;" name="工作单位" href="#工作单位"></a>工作单位</h2>
 
 <p>现在就职于 亚撒@alipay</p>
-
-<h2>微博</h2>
-
-<iframe width="100%" height="550" class="share_self"  frameborder="0" scrolling="no" src="http://widget.weibo.com/weiboshow/index.php?language=&width=0&height=550&fansRow=2&ptype=1&speed=0&skin=1&isTitle=1&noborder=1&isWeibo=1&isFans=1&uid=1438656755&verifier=b48b0477&dpc=1"></iframe>
 
   </div>
 </div>
@@ -129,11 +125,20 @@
 </script>
 
     
-<script>
-    var _gaq=[['_setAccount','UA-123-12'],['_trackPageview']];
-    (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
-    g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
-    s.parentNode.insertBefore(g,s)}(document,'script'));
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  var pluginUrl = '//www.google-analytics.com/plugins/ga/inpage_linkid.js';
+  _gaq.push(['_require', 'inpage_linkid', pluginUrl]);
+  _gaq.push(['_setAccount', 'UA-123-12']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
 </script>
   </body>
 </html>
