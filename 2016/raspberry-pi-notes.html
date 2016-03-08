@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>在项目的日子里</title>
+    <title>Raspberry Pi notes</title>
   
     <meta name="author" content="I&#39;m Shaohua">
 
@@ -78,32 +78,73 @@
 
       <div class="content">
         <div class="page-header">
-  <h1>在项目的日子里 </h1>
+  <h1>Raspberry Pi notes </h1>
 </div>
 
 <div class="row">
   <div class="span8">
-    <h1><a style="display: block;" name="卖到项目组干活" href="#卖到项目组干活"></a>卖到项目组干活</h1>
+    <p>最近又入手了一个Raspberry Pi2，大致使用记录一下</p>
 
-<p>大概在 20130808-20130912 被转手卖到另外一个热门项目里，是公司的明星项目。</p>
+<h2><a style="display: block;" name="安装raspbian" href="#安装raspbian"></a>安装Raspbian</h2>
 
-<p>感觉就是每天都加班到很晚，开会一大帮人，系分测分评审一大帮人。至于为什么这么多人希望这样，不知道，也许是想向老大表现，更好的晋升，拿到高KPI吧~</p>
+<p>直接到官网下载img <a href="http://www.raspberrypi.org/downloads">http://www.raspberrypi.org/downloads </a>
+windows通过win32 disk imager来写入tf卡或者sd卡（raspberry pi B+为SD卡）</p>
 
-<p>至于我，仅仅希望早点回家</p>
+<h2><a style="display: block;" name="配置raspberry-pi" href="#配置raspberry-pi"></a>配置Raspberry Pi</h2>
+
+<p>通过<strong>raspi-config</strong>来配置，可以expeand filesystem，或者修改启动类型，或者地区，或者修改密码。当然这些也都可以通过命令行来解决。</p>
+
+<h2><a style="display: block;" name="更换sources" href="#更换sources"></a>更换sources</h2>
+
+<p>由于没有更换软件源，导致下载略慢，改用国内镜像，那速度杠杠滴。
+官网有镜像地址列表: <a href="http://www.raspbian.org/RaspbianMirrors">http://www.raspbian.org/RaspbianMirrors</a>, 这里就选母校的mirror吧
+<a href="http://mirrors.zju.edu.cn/raspbian/raspbian/">http://mirrors.zju.edu.cn/raspbian/raspbian/</a></p>
+
+<p>那就用工具来修改/etc/apt/sources.list</p>
+
+<p><code>sudo vi /etc/apt/sources.list</code></p>
+
+<p>保存好之后，需要执行<code>sudo apt-get update</code>来更新软件列表。</p>
+
+<h2><a style="display: block;" name="ip怎么获取" href="#ip怎么获取"></a>IP怎么获取</h2>
+
+<ul>
+<li>通过路由器获取ip（得有权限，如果是智能路由器，可以app上直接查）</li>
+<li>可以通过脚本把ip发到邮件，每次启动就收到ip的邮件；</li>
+</ul>
+
+<p><a href="http://www.tuicool.com/articles/2AvIn2">树莓派Raspbian开机自动发ip邮件的解决方案</a></p>
+
+<p><a href="http://shumeipai.nxez.com/2014/03/18/let-raspberry-pi-ip-address-is-automatically-reported-to-the-mailbox.html">让树莓派自动上报IP地址到邮箱</a></p>
+
+<p><a href="http://www.opstool.com/article/299">自动发送本机ip到指定邮箱</a></p>
+
+<ul>
+<li>通过arp scan来查局域网内的设备信息（公司里面查找就略麻烦）
+<a href="http://blog.remibergsma.com/2013/05/03/howto-discover-the-ip-address-of-a-raspberry-pi-on-dhcp/">HOWTO discover the ip address of a Raspberry Pi</a></li>
+</ul>
+
+<h2><a style="display: block;" name="登录raspberry-pi" href="#登录raspberry-pi"></a>登录Raspberry Pi</h2>
+
+<blockquote>
+<p>默认账号为 pi/raspberry</p>
+</blockquote>
+
+<p>Enjoy it~</p>
 
     <hr>
     <div class="pagination">
       <ul>
         <ul>
           
-            <li class="prev"><a href="/2016/xx-net-agent.html" title="XX-Net-Agent 代理用法，替代了goagent">&larr; Previous</a></li>
+            <li class="prev"><a href="/Blog/Pantower-PM25-Sensor/" title="Pantower-PM25-Sensor">&larr; Previous</a></li>
           
           
 
             <li><a href="/archive">Archive</a></li>
 
           
-            <li class="next"><a href="/2012/new-born.html" title="你的第一篇博客">Next &rarr;</a></li>
+            <li class="next"><a href="/2016/xx-net-agent.html" title="XX-Net-Agent 代理用法，替代了goagent">Next &rarr;</a></li>
           
           
         </ul>
@@ -129,10 +170,14 @@
   
   <div class="span4">
     <h4>Published</h4>
-    <div class="date"><span>2013-08-23</span></div>
+    <div class="date"><span>2016-01-15</span></div>
     <br>
     <h4>Categories</h4>
     <ul class="tag_box">
+    
+      <li>
+  <a href="/categories/#Hardware-ref">Hardware <span>1</span></a>
+</li>
     
       <li>
   <a href="/categories/#Blog-ref">Blog <span>5</span></a>
@@ -144,7 +189,11 @@
     <ul class="tag_box">
     
       <li>
-  <a href="/tags/#Life-ref">Life <span>1</span></a>
+  <a href="/tags/#Hardware-ref">Hardware <span>2</span></a>
+</li>
+    
+      <li>
+  <a href="/tags/#RaspberryPi-ref">RaspberryPi <span>1</span></a>
 </li>
     
     </ul>

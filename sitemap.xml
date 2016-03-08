@@ -4,6 +4,16 @@
 		<loc>http://imshaohua.github.com/</loc>
 	</url>
 	<url>
+		<loc>http://imshaohua.github.com/Blog/Pantower-PM25-Sensor/</loc>
+		<lastmod>2016-03-08</lastmod>
+		<changefreq>weekly</changefreq>
+	</url>
+	<url>
+		<loc>http://imshaohua.github.com/2016/raspberry-pi-notes.html</loc>
+		<lastmod>2016-01-15</lastmod>
+		<changefreq>weekly</changefreq>
+	</url>
+	<url>
 		<loc>http://imshaohua.github.com/2016/xx-net-agent.html</loc>
 		<lastmod>2016-01-05</lastmod>
 		<changefreq>weekly</changefreq>

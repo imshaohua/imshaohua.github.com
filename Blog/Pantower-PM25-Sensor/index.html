@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Home</title>
+    <title>Pantower-PM25-Sensor</title>
   
     <meta name="author" content="I&#39;m Shaohua">
 
@@ -77,38 +77,13 @@
     <div class="container">
 
       <div class="content">
-        
-<div class="page-header">
-  <h1>Home </h1>
+        <div class="page-header">
+  <h1>Pantower-PM25-Sensor </h1>
 </div>
 
 <div class="row">
-  <div class="span12">
-    
-<h2>欢迎来我的杂草地</h2>
-<p>
-  没事就来这个地方发泄一下，记录一下心情，同时还可以写写最近的读书笔记或者记录玩的心得
-</p>
-<p>
-  这段文字位于pages/index.html ,使用以下命令获取帮助或访问gor官网
-</p>
-<pre><code>gor post "goodday" [dir/to/img/files]
-#即可生成 post/goodday.md文件, 打开你的markdown编辑器即可编写
-gor compile
-#瞬间完成,生成compiled文件夹,包含站点所有资源
-gor http
-#打开你的浏览器,访问 http://127.0.0.1:8080
-gor help
-#gor帮助</code></pre>
-
-
-<h2>最近更新</h2>
-
-
-<div class="post">
-  <h3 class="title"><a href="/Blog/Pantower-PM25-Sensor/">Pantower-PM25-Sensor</a> <span class="date">2016-03-08</span></h3>
-
-  <h1><a style="display: block;" name="aqi" href="#aqi"></a>AQI</h1>
+  <div class="span8">
+    <h1><a style="display: block;" name="aqi" href="#aqi"></a>AQI</h1>
 
 <p>杭城的空气每况日下，同时也想看看一些有机气体的指数，首当其冲就是甲醛，看了下国内外的传感器，发现Pantower有款传感器支持甲醛整合的，于是马云家入手了一个（型号是PMS5003S，不带S的比较多，带S就直接添加了甲醛传感器）</p>
 
@@ -132,122 +107,160 @@ PMS5003S串口的数据示例：</p>
 16:54|17:23|18:67|19:6|20:167|21:1|22:21|23:0|24:22|25:0|26:4|27:0|28:2|29:0|30:4|31:2|32:249|</p>
 </blockquote>
 
+<p>主要解决办法就是i2c设置lcd显示，让它一秒执行一次，不要每个loop都执行（新手原因^_^）</p>
 
-  <div class="more">
-    <a href="/Blog/Pantower-PM25-Sensor/" class="btn">read more..</a>
+<h1><a style="display: block;" name="实现代码" href="#实现代码"></a>实现代码</h1>
+
+<p>新建一个arduino工程，拷进去：（使用了LiquidCrystal_I2C库）
+<pre><code>
+#include &lt;Wire.h&gt;
+#include &lt;LiquidCrystal_I2C.h&gt;</p>
+
+<p>LiquidCrystal_I2C lcd(0x27, 16, 2);
+#define receiveDatIndex 24</p>
+
+<p>uint8_t receiveDat[receiveDatIndex]; //receive data from the air detector module</p>
+
+<p>void setup() {
+  Serial.begin(9600);
+  // put your setup code here, to run once:
+  lcd.begin();
+  lcd.backlight();
+  lcd.setCursor(0,0);
+  lcd.print(&ldquo;for JOJO~&ldquo;);
+  lcd.setCursor(0,1);
+}</p>
+
+<p>int i = 0;</p>
+
+<p>static unsigned char ucRxBuffer[250];
+static unsigned char ucRxCnt = 0;
+long _P25;
+long _P10;
+long _P100;
+float _HCHO;
+long _length;</p>
+
+<p>//read data for pantower sensor including HCHO
+void getPM25(unsigned char ucData) {
+  ucRxBuffer[ucRxCnt++] = ucData;</p>
+
+<p>if (ucRxBuffer[0] != 0x42 &amp;&amp; ucRxBuffer[1] != 0x4D)  {
+ucRxCnt = 0;
+  }</p>
+
+<p>//for debug data
+  Serial.print(ucRxCnt);
+  Serial.print(&rdquo;:&ldquo;);
+  Serial.print(ucData);
+  Serial.print(&ldquo;|&rdquo;);
+  if (ucRxCnt &gt; 31) {
+//usa standard
+//_P10 = (float)ucRxBuffer[4] * 256 + (float)ucRxBuffer[5];
+//_P25 = (float)ucRxBuffer[6] * 256 + (float)ucRxBuffer[7];
+//_P100 = (float)ucRxBuffer[8] * 256 + (float)ucRxBuffer[9];
+//china standard
+_P10 = (float)ucRxBuffer[10] * 256 + (float)ucRxBuffer[11];
+_P25 = (float)ucRxBuffer[12] * 256 + (float)ucRxBuffer[13];
+_P100 = (float)ucRxBuffer[14] * 256 + (float)ucRxBuffer[15];
+_HCHO = ((float)ucRxBuffer[28] * 256 + (float)ucRxBuffer[29])/1000;
+Serial.println();
+ucRxCnt = 0;
+  }
+}</p>
+
+<p>void readValue() {
+unsigned int length = Serial.available();
+if (length &gt; 0)<br />
+{
+getPM25(Serial.read());
+}
+}</p>
+
+<p>void loop() {
+// put your main code here, to run repeatedly:
+readValue();
+delay(3);
+static unsigned long OledTimer=millis();   //every 0.5s update the temperature and humidity from DHT11 sensor
+if (millis() - OledTimer &gt;=1000)
+{
+  //if at every loop,print data to LCD, it will be conflict for I2C and serial
+  // Print a message to the LCD.
+  OledTimer=millis();
+  lcd.setCursor(0,0);
+  lcd.print(&ldquo;PM2.5=&rdquo;);
+  lcd.print(_P25);
+  lcd.print(&ldquo;ug/m3 &ldquo;);
+  lcd.setCursor(0,1);
+  //lcd.clear();
+  lcd.print(&ldquo;HCHO=&rdquo;);
+  lcd.print(_HCHO);
+  lcd.print(&ldquo;mg/m3&rdquo;);
+}
+}
+</code></pre></p>
+
+    <hr>
+    <div class="pagination">
+      <ul>
+        <ul>
+          
+          
+            <li class="prev disabled"><a>&larr; Previous</a></li>
+          
+
+            <li><a href="/archive">Archive</a></li>
+
+          
+            <li class="next"><a href="/2016/raspberry-pi-notes.html" title="Raspberry Pi notes">Next &rarr;</a></li>
+          
+          
+        </ul>
+      </ul>
+    </div>
+    <hr>
+    
+<div id="disqus_thread"></div>
+<script>
+    var disqus_developer = 1;
+    var disqus_shortname = 'imshaohua'; // required: replace example with your forum shortname
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="http://disqus.com" class="dsq-brlink">blog comments powered by <span class="logo-disqus">Disqus</span></a>
+
   </div>
-</div>
-
-<div class="post">
-  <h3 class="title"><a href="/2016/raspberry-pi-notes.html">Raspberry Pi notes</a> <span class="date">2016-01-15</span></h3>
-
-  <p>最近又入手了一个Raspberry Pi2，大致使用记录一下</p>
-
-<h2><a style="display: block;" name="安装raspbian" href="#安装raspbian"></a>安装Raspbian</h2>
-
-<p>直接到官网下载img <a href="http://www.raspberrypi.org/downloads">http://www.raspberrypi.org/downloads </a>
-windows通过win32 disk imager来写入tf卡或者sd卡（raspberry pi B+为SD卡）</p>
-
-<h2><a style="display: block;" name="配置raspberry-pi" href="#配置raspberry-pi"></a>配置Raspberry Pi</h2>
-
-<p>通过<strong>raspi-config</strong>来配置，可以expeand filesystem，或者修改启动类型，或者地区，或者修改密码。当然这些也都可以通过命令行来解决。</p>
-
-<h2><a style="display: block;" name="更换sources" href="#更换sources"></a>更换sources</h2>
-
-<p>由于没有更换软件源，导致下载略慢，改用国内镜像，那速度杠杠滴。
-官网有镜像地址列表: <a href="http://www.raspbian.org/RaspbianMirrors">http://www.raspbian.org/RaspbianMirrors</a>, 这里就选母校的mirror吧
-<a href="http://mirrors.zju.edu.cn/raspbian/raspbian/">http://mirrors.zju.edu.cn/raspbian/raspbian/</a></p>
-
-<p>那就用工具来修改/etc/apt/sources.list</p>
-
-<p><code>sudo vi /etc/apt/sources.list</code></p>
-
-<p>保存好之后，需要执行<code>sudo apt-get update</code>来更新软件列表。</p>
-
-
-  <div class="more">
-    <a href="/2016/raspberry-pi-notes.html" class="btn">read more..</a>
-  </div>
-</div>
-
-<div class="post">
-  <h3 class="title"><a href="/2016/xx-net-agent.html">XX-Net-Agent 代理用法，替代了goagent</a> <span class="date">2016-01-05</span></h3>
-
-  <h2><a style="display: block;" name="接力goagent" href="#接力goagent"></a>接力GoAgent</h2>
-
-<p><a href="https://github.com/XX-net/XX-Net">XX-Net Anti-censor tools</a></p>
-
-<h2><a style="display: block;" name="使用方法" href="#使用方法"></a>使用方法</h2>
-
-<p>XX-Net-Agent 代理，替代了goagent <a href="https://github.com/XX-net/XX-Net/wiki/%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95">XX-Net 使用方法</a></p>
-
-<h2><a style="display: block;" name="创建gae" href="#创建gae"></a>创建GAE</h2>
-
-<p>如果仅仅是看看新闻，翻翻墙，上上facebook，逛逛twitter，那就skip吧</p>
-
-<p>如果需要看视频或者下载文件，必须用自己google agent的appids.<br />
-<a href="https://github.com/XX-net/XX-Net/wiki/how-to-create-my-appids">how to create my appids</a></p>
-
-<h2><a style="display: block;" name="创建gae的注意事项" href="#创建gae的注意事项"></a>创建GAE的注意事项</h2>
-
-<p>google账号需要开通验证服务：<a href="https://www.google.com/landing/2step/">Google&rsquo;s two-step verification page</a></p>
-
-<h3>参考下面的链接：</h3>
-
-<p><a href="http://www.cnet.com/how-to/how-to-set-up-googles-two-step-verification/">How to set up Google&rsquo;s two-step verification</a></p>
-
-
-  <div class="more">
-    <a href="/2016/xx-net-agent.html" class="btn">read more..</a>
-  </div>
-</div>
-
-<div class="post">
-  <h3 class="title"><a href="/2013/days-in-project.html">在项目的日子里</a> <span class="date">2013-08-23</span></h3>
-
-  <h1><a style="display: block;" name="卖到项目组干活" href="#卖到项目组干活"></a>卖到项目组干活</h1>
-
-<p>大概在 20130808-20130912 被转手卖到另外一个热门项目里，是公司的明星项目。</p>
-
-<p>感觉就是每天都加班到很晚，开会一大帮人，系分测分评审一大帮人。至于为什么这么多人希望这样，不知道，也许是想向老大表现，更好的晋升，拿到高KPI吧~</p>
-
-<p>至于我，仅仅希望早点回家</p>
-
-
-  <div class="more">
-    <a href="/2013/days-in-project.html" class="btn">read more..</a>
-  </div>
-</div>
-
-<div class="post">
-  <h3 class="title"><a href="/2012/new-born.html">你的第一篇博客</a> <span class="date">2012-12-22</span></h3>
-
-  <h1>感谢你使用Gor编写博客</h1>
-
-<h2>本文位于 posts/first-blog.md , 你可以任何删掉,修改这个文件</h2>
-
-<p>文件开头是当前文章的元数据</p>
-
-<ol>
-<li>date为自动生成, 当然,你可以修改,这是你的自由</li>
-<li>permalink 可以是固定地址,也可以由gor为你自动生成</li>
-<li>categories 就是分类, 可以多个</li>
-<li>tags 同理,多个标签也是很常见的</li>
-</ol>
-
-<p>请确保文件使用UTF8 without BOM编码</p>
-
-<h2>你可以通过执行下面的语句来新建一篇博客:</h2>
-
-<pre><code>gor post 文章标题
-</code></pre>
-
-
-  <div class="more">
-    <a href="/2012/new-born.html" class="btn">read more..</a>
-  </div>
-</div>
-
+  
+  <div class="span4">
+    <h4>Published</h4>
+    <div class="date"><span>2016-03-08</span></div>
+    <br>
+    <h4>Categories</h4>
+    <ul class="tag_box">
+    
+      <li>
+  <a href="/categories/#Blog-ref">Blog <span>5</span></a>
+</li>
+    
+    </ul>
+    <br>
+    <h4>Tags</h4>
+    <ul class="tag_box">
+    
+      <li>
+  <a href="/tags/#Hardware-ref">Hardware <span>2</span></a>
+</li>
+    
+      <li>
+  <a href="/tags/#Arduino-ref">Arduino <span>1</span></a>
+</li>
+    
+    </ul>
   </div>
 </div>
 
